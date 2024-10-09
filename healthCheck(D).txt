@@ -1,0 +1,26 @@
+Health(directory)
+
+public class DatabaseHealthcheck : IHealthCheck
+{
+
+	private DatabaseHealthCheck(IDbConnectionFactory dbConnectionFactory)	
+
+	public async Task<HealthCheckResult> CheckHealthAsync(
+		HealthCheckContext context,
+		CancellationToken cancellationToken = new())
+	{
+		try
+		{
+			using var connection = await _dbConnectionFactory.CreateConnectiomAsync();
+			using var command = connection.CreateCommand();
+			command.CommandText = "SELECT 1";		
+			command.ExecuteScalar();
+			return HealthCheckResult.healthy();
+	
+		}
+		catch (Exception exception)
+		{
+			return HealthCheckResult.Unhealthy(exception: exception);
+		}
+	}
+}
